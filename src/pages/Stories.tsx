@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Heart, MessageCircle, Flag, Loader2, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { auth } from '../lib/firebase';
@@ -117,6 +118,7 @@ function RiskBadge({ level }: { level?: string }) {
 
 
 export default function Stories() {
+  const navigate = useNavigate();
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -284,27 +286,13 @@ export default function Stories() {
     }
   };
 
-  const handleReport = async (storyId: string) => {
+  const handleReport = (storyId: string) => {
     const user = auth.currentUser;
     if (!user) {
       toast.error('Please sign in to report stories');
       return;
     }
-
-    try {
-      // Add a report document
-      await addDoc(collection(db, 'reports'), {
-        story_id: storyId,
-        user_id: user.uid,
-        reported_at: serverTimestamp(),
-        status: 'pending' // For admin to review
-      });
-
-      toast.success('Story reported. Thank you.');
-    } catch (error) {
-      console.error('Error reporting story:', error);
-      toast.error('Failed to report story.');
-    }
+    navigate(`/report/${storyId}`);
   };
 
   // --- Translation Handler ---

@@ -20,6 +20,7 @@ import Termsandconditions from './pages/termsandconditions';
 import ContactPage from './pages/ContactPage';
 import NotFound from './pages/NotFound';
 import { LoadingScreen } from './components/LoadingScreen';
+import ReportInfo from './pages/ReportInfo';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -65,6 +66,7 @@ function App() {
               <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
               <Route path="/termsandconditions" element={<Termsandconditions />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/report/:id" element={<ReportInfo />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>

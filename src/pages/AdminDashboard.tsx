@@ -47,6 +47,17 @@ interface ApprovedNGO {
   };
 }
 
+interface Report {
+  id: string;
+  story_id: string;
+  story_title: string;
+  reason: string;
+  details: string;
+  reported_at: any;
+  user_id: string;
+  status: 'pending';
+}
+
 interface Story {
   id: string;
   title: string;
@@ -62,6 +73,7 @@ export default function AdminDashboard() {
   const [pendingNGOs, setPendingNGOs] = useState<NGORequest[]>([]);
   const [approvedNGOs, setApprovedNGOs] = useState<ApprovedNGO[]>([]);
   const [stories, setStories] = useState<Story[]>([]);
+  const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
 
@@ -93,14 +105,19 @@ export default function AdminDashboard() {
       // Fetch stories and their report counts
       const fetchStoriesPromise = getDocs(query(collection(db, 'stories'), orderBy('created_at', 'desc')));
 
+      // Fetch pending reports
+      const fetchReportsPromise = getDocs(query(collection(db, 'reports'), where('status', '==', 'pending')));
+
       const [
         requestsSnapshot,
         approvedSnapshot,
-        storiesSnapshot
+        storiesSnapshot,
+        reportsSnapshot
       ] = await Promise.all([
         fetchPendingPromise,
         fetchApprovedPromise,
-        fetchStoriesPromise
+        fetchStoriesPromise,
+        fetchReportsPromise
       ]);
 
       const requestsList = requestsSnapshot.docs.map(
@@ -121,11 +138,34 @@ export default function AdminDashboard() {
       );
       setApprovedNGOs(approvedList);
 
+      // Process reports and calculate reportCount map
+      const reportsCountMap: Record<string, number> = {};
+      const reportsList = reportsSnapshot.docs.map(doc => {
+        const data = doc.data();
+        const sId = data.story_id;
+        if (sId) {
+          reportsCountMap[sId] = (reportsCountMap[sId] || 0) + 1;
+        }
+        return {
+          id: doc.id,
+          ...data
+        } as Report;
+      });
+
+      // Sort reports in memory by reported_at desc
+      reportsList.sort((a, b) => {
+        const timeA = a.reported_at?.seconds || 0;
+        const timeB = b.reported_at?.seconds || 0;
+        return timeB - timeA;
+      });
+      setReports(reportsList);
+
       // Process stories and fetch report counts for each
       const storiesList = storiesSnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
         risk_level: doc.data().risk_level || 'LOW',
+        reportCount: reportsCountMap[doc.id] || 0,
       } as Story));
 
       const riskOrder: Record<string, number> = { HIGH: 0, MEDIUM: 1, LOW: 2 };
@@ -232,9 +272,38 @@ export default function AdminDashboard() {
 
       toast.success(`Story "${storyTitle}" has been deleted.`, { id: toastId });
       setStories(prev => prev.filter(item => item.id !== storyId));
+      setReports(prev => prev.filter(item => item.story_id !== storyId));
     } catch (error) {
       console.error('Error deleting story: ', error);
       toast.error('Failed to delete story.', { id: toastId });
+    }
+  };
+
+  const handleDismissReport = async (reportId: string) => {
+    if (!window.confirm("Are you sure you want to dismiss this report?")) return;
+
+    const toastId = toast.loading("Dismissing report...");
+    try {
+      await deleteDoc(doc(db, 'reports', reportId));
+      toast.success("Report dismissed.", { id: toastId });
+      
+      const dismissedReport = reports.find(r => r.id === reportId);
+      if (dismissedReport) {
+        setStories(prevStories => prevStories.map(story => {
+          if (story.id === dismissedReport.story_id) {
+            return {
+              ...story,
+              reportCount: Math.max(0, (story.reportCount || 1) - 1)
+            };
+          }
+          return story;
+        }));
+      }
+
+      setReports(prev => prev.filter(item => item.id !== reportId));
+    } catch (error) {
+      console.error("Error dismissing report: ", error);
+      toast.error("Failed to dismiss report.", { id: toastId });
     }
   };
 
@@ -310,6 +379,56 @@ export default function AdminDashboard() {
                   </a>
                   <button onClick={() => handleDeleteApprovedNGO(ngo.id, ngo.name)} className="inline-flex items-center bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">
                     <Trash2 className="h-5 w-5 mr-2" /> Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Reported Stories Section */}
+      <section className="mb-16">
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6">Reported Stories</h2>
+        {reports.length === 0 ? (
+          <p className="text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">No pending reports.</p>
+        ) : (
+          <div className="space-y-6">
+            {reports.map(report => (
+              <div key={report.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-100 dark:border-gray-700">
+                <div className="flex justify-between items-start flex-wrap gap-4 mb-4">
+                  <div>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800/60 mb-2">
+                      {report.reason}
+                    </span>
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                      Story: <span className="italic">"{report.story_title}"</span>
+                    </h3>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                      Reported on {report.reported_at ? new Date(report.reported_at.seconds * 1000).toLocaleString() : 'N/A'}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="bg-gray-55 dark:bg-gray-900/35 p-4 rounded-lg border border-gray-100 dark:border-gray-700 mb-4">
+                  <span className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider block mb-1">Reason Description / Additional Details</span>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm italic">
+                    {report.details ? `"${report.details}"` : 'No additional details provided.'}
+                  </p>
+                </div>
+
+                <div className="flex space-x-4">
+                  <button
+                    onClick={() => handleDeleteStory(report.story_id, report.story_title)}
+                    className="inline-flex items-center bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors text-sm font-medium"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" /> Delete Story
+                  </button>
+                  <button
+                    onClick={() => handleDismissReport(report.id)}
+                    className="inline-flex items-center bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm font-medium"
+                  >
+                    <CheckCircle className="h-4 w-4 mr-2" /> Dismiss Report
                   </button>
                 </div>
               </div>
