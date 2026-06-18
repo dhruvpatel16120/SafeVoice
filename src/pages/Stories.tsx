@@ -590,6 +590,13 @@ export default function Stories() {
                       )}
                     </p>
 
+                    {story.risk_level === 'HIGH' && (
+                      <div className="mt-3 p-3 bg-red-50 dark:bg-red-950/20 border-l-4 border-red-500 rounded text-xs text-red-700 dark:text-red-300" onClick={(e) => e.stopPropagation()}>
+                        💡 <strong>In need of support?</strong> Immediate help is available. 
+                        Call the National {"Women's"} Helpline at <a href="tel:1091" className="underline font-bold hover:text-red-800 dark:hover:text-red-200">1091</a> or view our verified <a href="/resources" className="underline font-bold hover:text-red-800 dark:hover:text-red-200">NGO Directory</a>.
+                      </div>
+                    )}
+
                     {/* Media Display - only show when expanded */}
                     {isExpanded && story.media_urls && story.media_urls.length > 0 && (
                       <div className="mb-4 space-y-3">
@@ -719,6 +726,13 @@ export default function Stories() {
               <p className="text-gray-700 dark:text-gray-300 text-base leading-relaxed whitespace-pre-wrap">
                 {popupDisplayContent}
               </p>
+
+              {selectedStoryForPopup.risk_level === 'HIGH' && (
+                <div className="mt-3 p-3 bg-red-50 dark:bg-red-950/20 border-l-4 border-red-500 rounded text-xs text-red-700 dark:text-red-300">
+                  💡 <strong>In need of support?</strong> Immediate help is available. 
+                  Call the National {"Women's"} Helpline at <a href="tel:1091" className="underline font-bold hover:text-red-800 dark:hover:text-red-200">1091</a> or view our verified <a href="/resources" className="underline font-bold hover:text-red-800 dark:hover:text-red-200">NGO Directory</a>.
+                </div>
+              )}
 
               {/* Media Display Inside Popup */}
               {selectedStoryForPopup.media_urls && selectedStoryForPopup.media_urls.length > 0 && (
