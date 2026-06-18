@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import {
   createUserWithEmailAndPassword,
@@ -278,7 +278,7 @@ export default function Auth() {
             </div>
 
             <h1 className="mt-6 max-w-xl text-4xl font-black tracking-tight text-slate-900 dark:text-white sm:text-5xl lg:text-[3.4rem] lg:leading-[1.02]">
-              Create your{' '} <br/>
+              Create your{' '} <br />
               <span className="bg-gradient-to-r from-pink-500 to-fuchsia-500 bg-clip-text text-transparent">
                 Safe Space
               </span>
@@ -287,7 +287,7 @@ export default function Auth() {
             <div className="mt-5 h-1 w-24 rounded-full bg-gradient-to-r from-pink-400 to-fuchsia-500" />
 
             <p className="mt-6 max-w-lg text-lg leading-8 text-slate-900 dark:text-slate-300">
-              A supportive community where your <br/>story matters and your voice is heard.
+              A supportive community where your <br />story matters and your voice is heard.
             </p>
 
             <div className="mt-10 space-y-5">
@@ -352,11 +352,10 @@ export default function Auth() {
                 <button
                   type="button"
                   onClick={() => setAuthMethod('email')}
-                  className={`relative flex items-center gap-2 px-4 pb-3 text-sm font-semibold transition ${
-                    authMethod === 'email'
+                  className={`relative flex items-center gap-2 px-4 pb-3 text-sm font-semibold transition ${authMethod === 'email'
                       ? 'text-pink-600 dark:text-pink-400'
                       : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-                  }`}
+                    }`}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
@@ -371,11 +370,10 @@ export default function Auth() {
                 <button
                   type="button"
                   onClick={() => setAuthMethod('google')}
-                  className={`relative flex items-center gap-2 px-4 pb-3 text-sm font-semibold transition ${
-                    authMethod === 'google'
+                  className={`relative flex items-center gap-2 px-4 pb-3 text-sm font-semibold transition ${authMethod === 'google'
                       ? 'text-pink-600 dark:text-pink-400'
                       : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-                  }`}
+                    }`}
                 >
                   {/* Google tab icon – colored, 16px */}
                   <GoogleColoredIcon size={16} />
@@ -458,76 +456,71 @@ export default function Auth() {
                         </button>
                       </div>
                       {isSignUp && (
-                          <div className="mt-4 grid grid-cols-1 gap-y-3 text-sm sm:grid-cols-2 sm:gap-x-6">
-                            
-                            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                              <div
-                                className={`flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold ${
-                                  passwordChecks.length
-                                    ? 'bg-pink-500 text-white'
-                                    : 'bg-slate-200 text-slate-500 dark:bg-white/10 dark:text-slate-400'
-                                }`}
-                              >
-                                ✓
-                              </div>
-                              <span>At least 8 characters</span>
-                            </div>
+                        <div className="mt-4 grid grid-cols-1 gap-y-3 text-sm sm:grid-cols-2 sm:gap-x-6">
 
-                            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                              <div
-                                className={`flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold ${
-                                  passwordChecks.number
-                                    ? 'bg-pink-500 text-white'
-                                    : 'bg-slate-200 text-slate-500 dark:bg-white/10 dark:text-slate-400'
+                          <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                            <div
+                              className={`flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold ${passwordChecks.length
+                                  ? 'bg-pink-500 text-white'
+                                  : 'bg-slate-200 text-slate-500 dark:bg-white/10 dark:text-slate-400'
                                 }`}
-                              >
-                                ✓
-                              </div>
-                              <span>One number</span>
+                            >
+                              ✓
                             </div>
-
-                            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                              <div
-                                className={`flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold ${
-                                  passwordChecks.upper
-                                    ? 'bg-pink-500 text-white'
-                                    : 'bg-slate-200 text-slate-500 dark:bg-white/10 dark:text-slate-400'
-                                }`}
-                              >
-                                ✓
-                              </div>
-                              <span>One uppercase letter</span>
-                            </div>
-
-                            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                              <div
-                                className={`flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold ${
-                                  passwordChecks.special
-                                    ? 'bg-pink-500 text-white'
-                                    : 'bg-slate-200 text-slate-500 dark:bg-white/10 dark:text-slate-400'
-                                }`}
-                              >
-                                ✓
-                              </div>
-                              <span>One special character</span>
-                            </div>
-
-                            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                              <div
-                                className={`flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold ${
-                                  passwordChecks.lower
-                                    ? 'bg-pink-500 text-white'
-                                    : 'bg-slate-200 text-slate-500 dark:bg-white/10 dark:text-slate-400'
-                                }`}
-                              >
-                                ✓
-                              </div>
-                              <span>One lowercase letter</span>
-                            </div>
-
+                            <span>At least 8 characters</span>
                           </div>
-                        )};
-                                            </div>
+
+                          <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                            <div
+                              className={`flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold ${passwordChecks.number
+                                  ? 'bg-pink-500 text-white'
+                                  : 'bg-slate-200 text-slate-500 dark:bg-white/10 dark:text-slate-400'
+                                }`}
+                            >
+                              ✓
+                            </div>
+                            <span>One number</span>
+                          </div>
+
+                          <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                            <div
+                              className={`flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold ${passwordChecks.upper
+                                  ? 'bg-pink-500 text-white'
+                                  : 'bg-slate-200 text-slate-500 dark:bg-white/10 dark:text-slate-400'
+                                }`}
+                            >
+                              ✓
+                            </div>
+                            <span>One uppercase letter</span>
+                          </div>
+
+                          <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                            <div
+                              className={`flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold ${passwordChecks.special
+                                  ? 'bg-pink-500 text-white'
+                                  : 'bg-slate-200 text-slate-500 dark:bg-white/10 dark:text-slate-400'
+                                }`}
+                            >
+                              ✓
+                            </div>
+                            <span>One special character</span>
+                          </div>
+
+                          <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                            <div
+                              className={`flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold ${passwordChecks.lower
+                                  ? 'bg-pink-500 text-white'
+                                  : 'bg-slate-200 text-slate-500 dark:bg-white/10 dark:text-slate-400'
+                                }`}
+                            >
+                              ✓
+                            </div>
+                            <span>One lowercase letter</span>
+                          </div>
+
+                        </div>
+                      )}
+                    </div>
 
                     <button
                       type="submit"
@@ -606,10 +599,10 @@ export default function Auth() {
               </div>
 
               <p className="mt-6 text-center text-xs leading-5 text-slate-500 dark:text-slate-400">
-                By signing up, you agree to our{' '}
-                <span className="font-medium text-pink-600 dark:text-pink-400">Terms of Service</span>{' '}
+                By signing {isSignUp ? 'up' : 'in'}, you agree to our{' '}
+                <Link to="/termsandconditions" className="font-medium text-pink-600 hover:underline dark:text-pink-400">Terms of Service</Link>{' '}
                 and{' '}
-                <span className="font-medium text-pink-600 dark:text-pink-400">Privacy Policy</span>.
+                <Link to="/PrivacyPolicy" className="font-medium text-pink-600 hover:underline dark:text-pink-400">Privacy Policy</Link>.
               </p>
             </div>
           </section>
