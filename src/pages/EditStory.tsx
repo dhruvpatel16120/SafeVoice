@@ -61,12 +61,26 @@ export default function EditStory() {
   const navigate = useNavigate();
   const story = location.state?.story;
 
-  const [title, setTitle] = useState(story?.title || '');
-  const [content, setContent] = useState(story?.content || '');
+  const [title, setTitle] = useState(() => {
+    const saved = story?.id ? localStorage.getItem(`safevoice_edit_title_${story.id}`) : null;
+    return saved || story?.title || '';
+  });
+  const [content, setContent] = useState(() => {
+    const saved = story?.id ? localStorage.getItem(`safevoice_edit_content_${story.id}`) : null;
+    return saved || story?.content || '';
+  });
   const [tags, setTags] = useState<string[]>(story?.tags || []);
   const [mediaFiles, setMediaFiles] = useState<FileList | null>(null); // New media files
   const [existingMediaUrls, setExistingMediaUrls] = useState<(string | MediaItem)[]>(story?.media_urls || []); // Existing media URLs
   const [loading, setLoading] = useState(false);
+
+  // Save edit draft on change
+  useEffect(() => {
+    if (story?.id) {
+      localStorage.setItem(`safevoice_edit_title_${story.id}`, title);
+      localStorage.setItem(`safevoice_edit_content_${story.id}`, content);
+    }
+  }, [title, content, story?.id]);
 
   // Check authentication
   useEffect(() => {
@@ -156,6 +170,11 @@ export default function EditStory() {
         media_urls: updatedMediaUrls,
         updated_at: serverTimestamp()
       });
+
+      if (story?.id) {
+        localStorage.removeItem(`safevoice_edit_title_${story.id}`);
+        localStorage.removeItem(`safevoice_edit_content_${story.id}`);
+      }
 
       toast.success('Story updated successfully!');
       navigate('/share-story'); // Redirect back to the ShareStory page
@@ -329,7 +348,13 @@ export default function EditStory() {
           </button>
           <button
             type="button"
-            onClick={() => navigate('/share-story')}
+            onClick={() => {
+              if (story?.id) {
+                localStorage.removeItem(`safevoice_edit_title_${story.id}`);
+                localStorage.removeItem(`safevoice_edit_content_${story.id}`);
+              }
+              navigate('/share-story');
+            }}
             className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:underline transition-colors"
           >
             Cancel

@@ -106,8 +106,8 @@ function resolveMediaItem(entry: string | MediaItem): MediaItem {
 
 export default function ShareStory() {
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const [title, setTitle] = useState(() => localStorage.getItem('safevoice_draft_title') || '');
+  const [content, setContent] = useState(() => localStorage.getItem('safevoice_draft_content') || '');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
@@ -116,6 +116,12 @@ export default function ShareStory() {
   const [loadingCorrection, setLoadingCorrection] = useState<{ [storyId: string]: boolean }>({});
   const [loadingFormCorrection, setLoadingFormCorrection] = useState(false);
   const [loadingStories, setLoadingStories] = useState(false); // Add a loading state for fetching stories
+
+  // Save draft to localStorage on change
+  useEffect(() => {
+    localStorage.setItem('safevoice_draft_title', title);
+    localStorage.setItem('safevoice_draft_content', content);
+  }, [title, content]);
 
   // Voice recording state
   const [isRecording, setIsRecording] = useState(false);
@@ -469,6 +475,8 @@ export default function ShareStory() {
       setContent('');
       setSelectedTags([]);
       setMediaFiles([]);
+      localStorage.removeItem('safevoice_draft_title');
+      localStorage.removeItem('safevoice_draft_content');
     } catch (error) {
       console.error('Error inserting story:', error);
       toast.error('Failed to share story. Please try again.');
